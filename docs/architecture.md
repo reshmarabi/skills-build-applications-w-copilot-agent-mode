@@ -28,13 +28,13 @@ OctoFit Tracker is a three-tier application for a school fitness program. The st
 
 ## Implementation decisions
 
-- **Presentation tier:** Keep route pages and capability components responsible for rendering only. Use the shared API client for typed `/api` requests; each view exposes accessible loading, empty, and error states and renders the response data without duplicating API behavior.
-- **Logic tier:** Keep Express routes thin and place validation, persistence orchestration, scoring, aggregation, and recommendation selection in `services/octofitService.ts`. Return deliberate 4xx responses for invalid input or missing resources; do not expose Mongoose cast errors as 500s.
-- **Data tier:** Keep persistence rules in the Mongoose models: require meaningful user identity and goal fields, required team name and mascot with an empty members default, activity references and scoring/date fields, and workout focus/duration/difficulty. Keep seed data representative and idempotent.
-- **Activity tracking:** Accept `userId`, `teamId`, `type`, and positive integer `minutes`; validate ID format and confirm both referenced records exist before writing. Store the references as `user` and `team`, compute points centrally at one point per minute, and set `occurredAt` on the server.
-- **Team management:** Require a non-empty trimmed name, preserve the submitted mascot, and persist supplied member IDs as member references. Omitted members default to an empty array; reject malformed or nonexistent member IDs with a deliberate 4xx.
-- **Leaderboard:** Sum activity points by team, include teams with no activity at zero points, sort by total points descending with team name as a deterministic tie-breaker, and assign 1-based ranks in the returned order.
-- **Workout suggestions:** Find the user by normalized email; return 404 when there is no match. Prefer workouts matching the user's fitness goal, falling back to their most recent activity type when needed; put the best match first and include a reason tied to the goal or activity.
+- Presentation tier decision: Keep route pages and capability components responsible for rendering only. Use the shared API client for typed `/api` requests; each view exposes accessible loading, empty, and error states and renders the response data without duplicating API behavior.
+- Logic tier decision: Keep Express routes thin and place validation, persistence orchestration, scoring, aggregation, and recommendation selection in `services/octofitService.ts`. Return deliberate 4xx responses for invalid input or missing resources; do not expose Mongoose cast errors as 500s.
+- Data tier decision: Keep persistence rules in the Mongoose models: require meaningful user identity and goal fields, required team name and mascot with an empty members default, activity references and scoring/date fields, and workout focus/duration/difficulty. Keep seed data representative and idempotent.
+- Activity tracking approach: Accept `userId`, `teamId`, `type`, and positive integer `minutes`; validate ID format and confirm both referenced records exist before writing. Store the references as `user` and `team`, compute points centrally at one point per minute, and set `occurredAt` on the server.
+- Team management approach: Require a non-empty trimmed name, preserve the submitted mascot, and persist supplied member IDs as member references. Omitted members default to an empty array; reject malformed or nonexistent member IDs with a deliberate 4xx.
+- Leaderboard approach: Sum activity points by team, include teams with no activity at zero points, sort by total points descending with team name as a deterministic tie-breaker, and assign 1-based ranks in the returned order.
+- Workout suggestions approach: Find the user by normalized email; return 404 when there is no match. Prefer workouts matching the user's fitness goal, falling back to their most recent activity type when needed; put the best match first and include a reason tied to the goal or activity.
 
 ## Test plan
 
